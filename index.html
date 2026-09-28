@@ -1,0 +1,1898 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chuyên Đề Toán 11 (KNTT) • Bóc Tách Toàn Diện Hàm Số y = cot x</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- KaTeX for pristine mathematical typesetting -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+    <style>
+        :root {
+            --bg-deep: #060911;
+            --bg-surface: rgba(15, 23, 42, 0.88);
+            --bg-card: rgba(26, 36, 56, 0.78);
+            --border-card: rgba(148, 163, 184, 0.18);
+            --border-glow: rgba(56, 189, 248, 0.45);
+            
+            --primary: #38bdf8;       /* Cyan neon */
+            --primary-glow: rgba(56, 189, 248, 0.45);
+            --secondary: #f43f5e;     /* Rose red */
+            --secondary-glow: rgba(244, 63, 94, 0.4);
+            --accent: #facc15;        /* Gold amber */
+            --green: #34d399;         /* Emerald */
+            --purple: #c084fc;        /* Violet neon */
+            
+            --text-title: #ffffff;
+            --text-body: #e2e8f0;
+            --text-muted: #94a3b8;
+            --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-deep);
+            color: var(--text-body);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+            position: relative;
+        }
+
+        /* Subtle animated math grid canvas */
+        #bg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        /* Particle Confetti Canvas for Slide 15 */
+        #confetti-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 999;
+            pointer-events: none;
+        }
+
+        /* Top Header */
+        header {
+            position: relative;
+            z-index: 10;
+            padding: 10px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-card);
+            background: rgba(10, 15, 30, 0.85);
+            backdrop-filter: blur(14px);
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .badge-kntt {
+            background: linear-gradient(135deg, #0284c7, #38bdf8);
+            color: #ffffff;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+            box-shadow: 0 0 14px rgba(56, 189, 248, 0.4);
+        }
+
+        .badge-student {
+            background: linear-gradient(135deg, #8b5cf6, #d946ef);
+            color: #ffffff;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .header-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-status {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-family: var(--font-mono);
+            font-size: 0.88rem;
+        }
+
+        .timer-badge {
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(250, 204, 21, 0.12);
+            border: 1px solid rgba(250, 204, 21, 0.35);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .slide-counter {
+            color: var(--primary);
+            font-weight: 700;
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        /* Slide Stage Container */
+        .stage-container {
+            position: relative;
+            z-index: 5;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 32px;
+            perspective: 1400px;
+        }
+
+        .slide {
+            position: absolute;
+            width: 95%;
+            max-width: 1360px;
+            height: 83vh;
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.96) translateZ(-40px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .slide.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1) translateZ(0);
+        }
+
+        /* Card Container */
+        .slide-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(22px);
+            border: 1px solid var(--border-card);
+            border-radius: 22px;
+            padding: 24px 34px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--purple), var(--secondary), var(--accent), var(--green));
+        }
+
+        .slide-header {
+            margin-bottom: 12px;
+        }
+
+        .slide-subtitle {
+            color: var(--primary);
+            font-size: 0.82rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 3px;
+        }
+
+        .slide-title {
+            font-size: 1.82rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--text-title);
+            line-height: 1.25;
+        }
+
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1.05fr 1fr;
+            gap: 22px;
+            align-items: center;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .grid-equal {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .grid-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            gap: 14px;
+            min-height: 0;
+        }
+
+        .panel-box {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Math Display Boxes with Hover Glow */
+        .math-highlight-card {
+            background: rgba(15, 23, 42, 0.88);
+            border-left: 4px solid var(--primary);
+            padding: 12px 18px;
+            border-radius: 0 12px 12px 0;
+            font-size: 1.15rem;
+            color: #38bdf8;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.25s ease;
+        }
+
+        .math-highlight-card:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 20px rgba(56, 189, 248, 0.25);
+        }
+
+        .math-danger-card {
+            background: rgba(244, 63, 94, 0.12);
+            border-left: 4px solid var(--secondary);
+            padding: 12px 18px;
+            border-radius: 0 12px 12px 0;
+            color: #fda4af;
+            font-size: 1.02rem;
+            transition: all 0.25s ease;
+        }
+
+        .math-danger-card:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 20px rgba(244, 63, 94, 0.25);
+        }
+
+        .math-success-card {
+            background: rgba(52, 211, 153, 0.12);
+            border-left: 4px solid var(--green);
+            padding: 12px 18px;
+            border-radius: 0 12px 12px 0;
+            color: #a7f3d0;
+            font-size: 1.02rem;
+            transition: all 0.25s ease;
+        }
+
+        .math-success-card:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 20px rgba(52, 211, 153, 0.25);
+        }
+
+        /* Student Tip Callouts */
+        .student-tip-box {
+            background: rgba(250, 204, 21, 0.09);
+            border: 1px dashed rgba(250, 204, 21, 0.4);
+            border-radius: 10px;
+            padding: 9px 14px;
+            font-size: 0.88rem;
+            color: #fde047;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            line-height: 1.45;
+        }
+
+        .student-trap-box {
+            background: rgba(244, 63, 94, 0.12);
+            border: 1px solid rgba(244, 63, 94, 0.35);
+            border-radius: 10px;
+            padding: 9px 14px;
+            font-size: 0.88rem;
+            color: #fda4af;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            line-height: 1.45;
+        }
+
+        /* Feature Bullet List */
+        .feature-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .feature-list li {
+            position: relative;
+            padding-left: 24px;
+            font-size: 0.94rem;
+            line-height: 1.45;
+            color: #cbd5e1;
+        }
+
+        .feature-list li::before {
+            content: '⚡';
+            position: absolute;
+            left: 0;
+            font-size: 0.85rem;
+        }
+
+        .feature-list strong {
+            color: #ffffff;
+        }
+
+        /* Image Display & Zoom Container */
+        .media-frame {
+            position: relative;
+            height: 100%;
+            max-height: 410px;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-glow);
+            background: #090d16;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .media-frame:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 25px var(--primary-glow);
+            transform: translateY(-2px);
+        }
+
+        .media-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            image-rendering: high-quality;
+        }
+
+        .zoom-hint {
+            position: absolute;
+            bottom: 10px;
+            right: 12px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid var(--primary);
+            color: #38bdf8;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 6px;
+            backdrop-filter: blur(8px);
+            pointer-events: none;
+            opacity: 0.85;
+            transition: opacity 0.2s;
+        }
+
+        .media-frame:hover .zoom-hint {
+            opacity: 1;
+        }
+
+        /* Interactive Dynamic Circle Widget (Slide 4) */
+        .interactive-circle-container {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--border-glow);
+            border-radius: 16px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            height: 100%;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            flex: 1;
+            min-height: 230px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #unit-circle-canvas {
+            background: #080d1a;
+            border-radius: 12px;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            width: 100%;
+            height: 100%;
+            max-height: 250px;
+        }
+
+        .slider-control-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: rgba(30, 41, 59, 0.6);
+            padding: 10px 14px;
+            border-radius: 10px;
+        }
+
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .angle-slider {
+            flex: 1;
+            accent-color: var(--primary);
+            cursor: pointer;
+            height: 6px;
+        }
+
+        .preset-btn-group {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .preset-btn {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border-card);
+            color: #cbd5e1;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.74rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .preset-btn:hover, .preset-btn.active {
+            background: var(--primary);
+            color: #060911;
+            border-color: var(--primary);
+            font-weight: 700;
+        }
+
+        .readout-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            text-align: center;
+        }
+
+        .readout-card {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border-card);
+            padding: 4px 6px;
+            border-radius: 6px;
+        }
+
+        .readout-label {
+            color: var(--text-muted);
+            font-size: 0.68rem;
+            display: block;
+        }
+
+        .readout-val {
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        /* Step by Step Accordion on Slide 6 */
+        .step-item {
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid var(--border-card);
+            border-radius: 10px;
+            padding: 10px 14px;
+            cursor: pointer;
+            transition: all 0.25s;
+            margin-bottom: 8px;
+        }
+
+        .step-item:hover {
+            border-color: var(--primary);
+            background: rgba(56, 189, 248, 0.06);
+        }
+
+        .step-item.active {
+            border-color: var(--green);
+            background: rgba(52, 211, 153, 0.08);
+        }
+
+        .step-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            font-size: 0.92rem;
+            color: #f8fafc;
+        }
+
+        .step-body {
+            display: none;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(148, 163, 184, 0.15);
+            font-size: 0.88rem;
+            color: #cbd5e1;
+            line-height: 1.5;
+        }
+
+        .step-item.active .step-body {
+            display: block;
+        }
+
+        /* Speaker Prompter Bar - Student Style */
+        .prompter-box {
+            background: rgba(15, 23, 42, 0.94);
+            border: 1px dashed rgba(250, 204, 21, 0.45);
+            border-radius: 12px;
+            padding: 9px 16px;
+            color: #fef08a;
+            font-size: 0.84rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            line-height: 1.45;
+            margin-top: 8px;
+            transition: all 0.3s;
+        }
+
+        .prompter-box.collapsed {
+            display: none;
+        }
+
+        .prompter-icon {
+            font-size: 1.15rem;
+            color: var(--accent);
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .prompter-text {
+            flex: 1;
+        }
+
+        .prompter-text strong {
+            color: #ffffff;
+            font-weight: 800;
+        }
+
+        /* Bottom Control Bar */
+        footer {
+            position: relative;
+            z-index: 10;
+            padding: 8px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-card);
+            background: rgba(10, 15, 30, 0.85);
+            backdrop-filter: blur(14px);
+        }
+
+        .progress-track {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(148, 163, 184, 0.25);
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .dot:hover {
+            background: var(--primary);
+            transform: scale(1.3);
+        }
+
+        .dot.active {
+            width: 24px;
+            border-radius: 10px;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-ui {
+            background: rgba(30, 41, 59, 0.85);
+            color: #f8fafc;
+            border: 1px solid var(--border-card);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.82rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-ui:hover {
+            background: var(--primary);
+            color: #060911;
+            border-color: var(--primary);
+            box-shadow: 0 0 12px var(--primary-glow);
+        }
+
+        .btn-primary-glow {
+            background: linear-gradient(135deg, #0284c7, #38bdf8);
+            color: #060911;
+            font-weight: 700;
+            border: none;
+        }
+
+        /* Lightbox Modal */
+        #lightbox-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(6, 9, 17, 0.96);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 24px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #lightbox-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        #lightbox-img {
+            max-width: 92vw;
+            max-height: 84vh;
+            border-radius: 14px;
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 40px rgba(56, 189, 248, 0.5);
+            object-fit: contain;
+        }
+
+        .lightbox-close-btn {
+            position: absolute;
+            top: 20px;
+            right: 28px;
+            background: rgba(244, 63, 94, 0.2);
+            border: 1px solid var(--secondary);
+            color: #fda4af;
+            padding: 7px 16px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        /* Interactive Quiz on Slide 15 */
+        .quiz-card {
+            background: rgba(15, 23, 42, 0.7);
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid var(--border-card);
+            margin-bottom: 10px;
+            transition: border-color 0.2s;
+        }
+
+        .quiz-card:hover {
+            border-color: rgba(56, 189, 248, 0.4);
+        }
+
+        .quiz-option {
+            background: rgba(30, 41, 59, 0.55);
+            border: 1px solid var(--border-card);
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-top: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.88rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .quiz-option:hover {
+            border-color: var(--primary);
+            background: rgba(56, 189, 248, 0.12);
+        }
+
+        .quiz-option.correct {
+            border-color: var(--green) !important;
+            background: rgba(52, 211, 153, 0.22) !important;
+            color: #a7f3d0 !important;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(52, 211, 153, 0.3);
+        }
+
+        .quiz-option.wrong {
+            border-color: var(--secondary) !important;
+            background: rgba(244, 63, 94, 0.2) !important;
+            color: #fda4af !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Animated Mathematical Mesh Background -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Confetti Particle Canvas -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="header-brand">
+            <span class="badge-kntt">TOÁN 11 • KNTT</span>
+            <span class="badge-student">BÀI THUYẾT TRÌNH HỌC SINH</span>
+            <span class="header-title">
+                <span>Chuyên Đề Bài 3: Khảo Sát Toàn Diện</span>
+                <span style="color: var(--primary); font-family: var(--font-mono); font-weight: 800;">y = cot x</span>
+            </span>
+        </div>
+        <div class="header-status">
+            <div class="timer-badge">
+                <span>⏱</span>
+                <span id="elapsed-time">00:00</span> / 10:00
+            </div>
+            <div class="slide-counter" id="slide-index-label">SLIDE 1 / 15</div>
+        </div>
+    </header>
+
+    <!-- Main Presentation Stage -->
+    <div class="stage-container">
+
+        <!-- SLIDE 1: BÌA HỌC SINH THUYẾT TRÌNH NĂNG ĐỘNG -->
+        <div class="slide active">
+            <div class="slide-card" style="text-align: center; justify-content: center; gap: 18px;">
+                <div style="display: flex; justify-content: center; gap: 10px; align-items: center;">
+                    <span style="color: var(--primary); font-weight: 800; font-size: 0.95rem; letter-spacing: 2px;">
+                        BÀI 3: CÁC HÀM SỐ LƯỢNG GIÁC • SÁCH KẾT NỐI TRI THỨC VỚI CUỘC SỐNG
+                    </span>
+                </div>
+                <h1 style="font-size: 3.2rem; font-weight: 800; color: #ffffff; line-height: 1.2;">
+                    GIẢI MÃ TOÀN DIỆN<br>
+                    HÀM SỐ LƯỢNG GIÁC <span style="color: var(--primary); font-family: var(--font-mono); text-shadow: 0 0 30px rgba(56, 189, 248, 0.7);">y = cot x</span>
+                </h1>
+
+                <div class="prompter-box">
+                    <span class="prompter-icon">🎙️</span>
+                    <div class="prompter-text">
+                        <strong>LỜI NÓI HỌC SINH MỞ ĐẦU (0:00 - 0:45):</strong> "Chào thầy cô và chào tất cả các bạn! Trong 4 hàm số lượng giác của Bài 3, hàm số $y = \cot x$ thường là hàm làm tụi mình dễ hoang mang và dễ mất điểm oan nhất trong phòng thi vì tập xác định và tiệm cận của nó. Nhưng hôm nay, nhóm mình sẽ cùng mọi người 'mổ xẻ' hàm số này từ góc nhìn cực kỳ trực quan, dễ hiểu, kèm theo những mẹo nhớ siêu nhanh để lớp mình ai cũng tự tin giành trọn điểm 10 khi làm bài kiểm tra nhé!"
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 2: MỤC LỤC LỘ TRÌNH 10 PHÚT -->
+        <div class="slide">
+            <div class="slide-card">
+                <div class="slide-header">
+                    <div class="slide-subtitle">LỘ TRÌNH THUYẾT TRÌNH • 10 PHÚT PHÁ ĐẢO</div>
+                    <h2 class="slide-title">Kế Hoạch Khám Phá 7 Trọng Tâm SGK Cùng Nhóm Mình</h2>
+                </div>
+                <div class="grid-equal">
+                    <div class="panel-box" style="background: rgba(15,23,42,0.65); padding: 20px; border-radius: 14px; border: 1px solid var(--border-card);">
+                        <h4 style="color: var(--primary); margin-bottom: 6px; font-size: 1rem; display: flex; align-items: center; gap: 8px;">
+                            <span>🚀 CHẶNG 1: NỀN MÓNG CƠ BẢN (PHẦN 1 - 4)</span>
+                        </h4>
+                        <ul class="feature-list" style="font-size: 0.92rem;">
+                            <li><strong>1. Bản chất hàm số:</strong> Cos chia Sin & Ý nghĩa trục tiếp tuyến $y = 1$ trên đường tròn.</li>
+                            <li><strong>2. Tập xác định:</strong> Vì sao $\sin x \neq 0 \iff x \neq k\pi$? Hình ảnh 2 thanh ray song song.</li>
+                            <li><strong>3. Miền giá trị rộng mở:</strong> $\mathcal{T} = \mathbb{R}$, bay nhảy tự do từ $-\infty$ đến $+\infty$.</li>
+                            <li><strong>4. Tính chẵn - lẻ:</strong> Chứng minh hàm lẻ $\cot(-x) = -\cot x$, tâm đối xứng qua gốc $O$.</li>
+                        </ul>
+                    </div>
+                    <div class="panel-box" style="background: rgba(15,23,42,0.65); padding: 20px; border-radius: 14px; border: 1px solid var(--border-card);">
+                        <h4 style="color: var(--accent); margin-bottom: 6px; font-size: 1rem; display: flex; align-items: center; gap: 8px;">
+                            <span>⚡ CHẶNG 2: THỰC CHIẾN ĐỒ THỊ & VẠCH BẪY (PHẦN 5 - 7)</span>
+                        </h4>
+                        <ul class="feature-list" style="font-size: 0.92rem;">
+                            <li><strong>5. Chu kỳ $T = \pi$:</strong> Vì sao chỉ cần nửa vòng tròn là lặp lại giá trị cũ?</li>
+                            <li><strong>6. Chiều biến thiên:</strong> Luôn nghịch biến trên từng khoảng & vạch trần bẫy thi cử.</li>
+                            <li><strong>7. Bảng biến thiên & Đồ thị:</strong> Bí quyết vẽ nhanh các nhánh dốc xuống và tiệm cận.</li>
+                            <li><strong style="color: var(--green);">★ Món quà đố vui cuối giờ:</strong> So sánh với Tan & 2 câu trắc nghiệm rinh quà!</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="prompter-box">
+                    <span class="prompter-icon">🎙️</span>
+                    <div class="prompter-text">
+                        <strong>LỜI NÓI HỌC SINH (0:45 - 1:15):</strong> "Để mọi người dễ theo dõi và không bị ngợp, nhóm mình đã chia bài nói thành 2 chặng rất rõ ràng: Chặng 1 tụi mình giải mã bản chất hình học để hiểu gốc rễ; Chặng 2 tụi mình cùng nhau vẽ đồ thị và vạch trần những cái bẫy trắc nghiệm mà các thầy cô chuyên gia hay gài vào đề thi!"
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 3: ĐỊNH NGHĨA ĐẠI SỐ -->
+        <div class="slide">
+            <div class="slide-card">
+                <div class="slide-header">
+                    <div class="slide-subtitle">PHẦN 1 • GỐC RỄ ĐẠI SỐ</div>
+                    <h2 class="slide-title">1. Định Nghĩa Đại Số: Cứ Nhớ "Cotang Là Cos Chia Sin"</h2>
+                </div>
+                <div class="grid-2">
+                    <div class="panel-box">
+                        <div class="math-highlight-card">
+                            $$y = \cot x = \frac{\cos x}{\sin x} \quad (\sin x \neq 0)$$
+                        </div>
+                        <ul class="feature-list">
+                            <li><strong>Khái niệm theo SGK:</strong> Là quy tắc ứng mỗi số thực $x$ (thỏa mãn $\sin x \neq 0$) với một giá trị duy nhất là $\frac{\cos x}{\sin x}$.</li>
+                            <li><strong>Mẹo nhớ dấu siêu dễ:</strong> Vì là tỉ số của Cos chia Sin, nên trong góc phần tư nào Cos và Sin <strong>cùng dấu</strong> thì $\cot x > 0$; trái dấu thì $\cot x < 0$.</li>
+                            <li><strong>Mối quan hệ "chị em" với hàm tan:</strong> 
+                                $$\cot x = \frac{1}{\tan x} \quad (\text{khi } x \neq k\frac{\pi}{2})$$
+                            </li>
+                        </ul>
+                        <div class="student-tip-box">
+                            <span>💡</span>
+                            <span><strong>Mẹo nhớ vui của học sinh:</strong> <em>"Bắt quả tang (tan) sin nằm trên cos. Còn cotang (cot) thì cos nhảy lên ngồi đầu sin!"</em></span>
+                        </div>
+                    </div>
+                    <div class="panel-box" style="background: rgba(15,23,42,0.7); padding: 18px; border-radius: 14px; border: 1px solid var(--border-card);">
+                        <h4 style="color: var(--accent); margin-bottom: 8px; font-size: 0.95rem;">📊 BẢNG GIÁ TRỊ GÓC ĐẶC BIỆT (HỌC KỸ ĐỂ ĂN ĐIỂM)</h4>
+                        <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 0.92rem; font-family: var(--font-mono);">
+                            <tr style="border-bottom: 2px solid var(--border-card); color: var(--primary);">
+                                <th style="padding: 6px;">Góc $x$</th>
+                                <th>$0$</th>
+                                <th>$\frac{\pi}{6}$</th>
+                                <th>$\frac{\pi}{4}$</th>
+                                <th>$\frac{\pi}{3}$</th>
+                                <th>$\frac{\pi}{2}$</th>
+                                <th>$\pi$</th>
+                            </tr>
+                            <tr style="color: #ffffff;">
+                                <td style="padding: 9px; font-weight: bold; color: var(--accent);">$\cot x$</td>
+                                <td style="color: var(--secondary); font-weight: bold;">|| (KXĐ)</td>
+                                <td>$\sqrt{3}$</td>
+                                <td style="color: var(--green); font-weight: bold;">$1$</td>
+                                <td>$\frac{\sqrt{3}}{3}$</td>
+                                <td style="color: var(--primary); font-weight: bold;">$0$</td>
+                                <td style="color: var(--secondary); font-weight: bold;">|| (KXĐ)</td>
+                            </tr>
+                        </table>
+                        <div style="font-size: 0.82rem; color: #cbd5e1; margin-top: 10px; line-height: 1.45;">
+                            • Tại $x = \frac{\pi}{2}$ ($90^\circ$): $\cos = 0 \implies \cot = 0$ (Đồ thị cắt ngay trục hoành).<br>
+                            • Tại $x = 0$ và $\pi$: Mẫu $\sin = 0 \implies$ Máy tính báo <strong>Math ERROR</strong> (Không xác định)!
+                        </div>
+                    </div>
+                </div>
+                <div class="prompter-box">
+                    <span class="prompter-icon">🎙️</span>
+                    <div class="prompter-text">
+                        <strong>LỜI NÓI HỌC SINH (1:15 - 2:00):</strong> "Đầu tiên về công thức đại số, các bạn chỉ cần nhớ câu thần chú: cotang là cos chia sin. Vì sin nằm dưới mẫu, nên hễ góc nào làm sin bằng 0 là máy tính Casio sẽ lập tức la ó 'Math ERROR' ngay! Ví dụ tại 0 và pi, cotang hoàn toàn không xác định. Còn tại 90 độ (pi/2) thì cos bằng 0 nên cotang ung dung bằng 0."
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 4: ĐỊNH NGHĨA HÌNH HỌC VỚI WIDGET ĐỘNG TƯƠNG TÁC -->
+        <div class="slide">
+            <div class="slide-card">
+                <div class="slide-header">
+                    <div class="slide-subtitle">PHẦN 1 • TRỰC QUAN HÓA TOÁN HỌC SỐNG ĐỘNG</div>
+                    <h2 class="slide-title">1. Trục Cotang Trên Đường Tròn: Xem Điểm $H$ Chạy Trực Tiếp!</h2>
+                </div>
+                <div class="grid-2">
+                    <div class="panel-box">
+                        <ul class="feature-list">
+                            <li><strong>Trục cotang nằm ở đâu?</strong> Nó là đường tiếp tuyến nằm ngang $y = 1$ tiếp xúc với đỉnh cực bắc $J(0, 1)$ của đường tròn lượng giác.</li>
+                            <li><strong>Cách lấy giá trị $\cot x$:</strong> Nối tia $OM$ từ tâm qua điểm biểu diễn góc $x$, kéo dài tia này cắt trục cotang tại điểm $H(\cot x, 1)$. Độ dài đại số từ điểm mốc $J$ đến $H$ chính là giá trị $\cot x$!</li>
+                            <li><strong>Quy luật dấu siêu trực quan:</strong>
+                                <ul style="margin: 4px 0 0 14px; font-size: 0.88rem; color: #cbd5e1;">
+                                    <li>Góc nhọn $x \in (0; 90^\circ)$: Điểm $H$ nằm bên phải mốc $J \implies \cot x > 0$.</li>
+                                    <li>Góc tù $x \in (90^\circ; 180^\circ)$: Điểm $H$ chạy sang bên trái mốc $J \implies \cot x < 0$.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <div class="student-tip-box" style="margin-top: 6px;">
+                            <span>🎮</span>
+                            <span><strong>Thử nghiệm ngay:</strong> Kéo thanh trượt bên cạnh hoặc bấm các nút góc nhanh để thấy tia $OM$ xoay và điểm $H$ trượt nhé!</span>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Canvas Widget -->
+                    <div class="interactive-circle-container">
+                        <div class="canvas-wrapper">
+                            <canvas id="unit-circle-canvas" width="460" height="230"></canvas>
+                        </div>
+                        <div class="slider-control-bar">
+                            <div class="slider-row">
+                                <span style="font-size: 0.8rem; font-weight: 700; color: var(--primary); min-width: 60px;">Góc x:</span>
+                                <input type="range" id="angle-slider" class="angle-slider" min="10" max="170" value="45">
+                                <span id="angle-display" style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: bold; color: var(--accent); min-width: 48px;">45°</span>
+                            </div>
+                            <div class="preset-btn-group">
+                                <span style="font-size: 0.72rem; color: var(--text-muted); align-self: center;">Góc nhanh:</span>
+                                <button class="preset-btn" onclick="setAngle(30)">30° (π/6)</button>
+                                <button class="preset-btn active" onclick="setAngle(45)">45° (π/4)</button>
+                                <button class="preset-btn" onclick="setAngle(60)">60° (π/3)</button>
+                                <button class="preset-btn" onclick="setAngle(90)">90° (π/2)</button>
+                                <button class="preset-btn" onclick="setAngle(120)">120° (2π/3)</button>
+                                <button class="preset-btn" onclick="setAngle(135)">135° (3π/4)</button>
+                            </div>
+                        </div>
+                        <div class="readout-grid">
+                            <div class="readout-card">
+                                <span class="readout-label">cos x</span>
+                                <span class="readout-val" id="val-cos" style="color: var(--primary);">0.71</span>
+                            </div>
+                            <div class="readout-card">
+                                <span class="readout-label">sin x</span>
+                                <span class="readout-val" id="val-sin" style="color: var(--green);">0.71</span>
+                            </div>
+                            <div class="readout-card">
+                                <span class="readout-label">cot x</span>
+                                <span class="readout-val" id="val-cot" style="color: var(--accent);">1.00</span>
+                            </div>
+                            <div class="readout-card">
+                                <span class="readout-label">Điểm H</span>
+                                <span class="readout-val" id="val-pt" style="color: var(--purple);">(1.0, 1.0)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="prompter-box">
+                    <span class="prompter-icon">🎙️</span>
+                    <div class="prompter-text">
+                        <strong>LỜI NÓI HỌC SINH (2:00 - 3:00):</strong> "Các bạn hãy nhìn vào mô hình động nhóm mình vừa thiết kế ở bên phải: Trục cotang chính là đường nằm ngang màu vàng trên đỉnh đường tròn. Khi mình kéo góc từ 30 độ lên 135 độ, mọi người thấy ngay điểm H màu tím trượt liên tục từ bên phải sang bên trái! Đây chính là bằng chứng vàng giải thích vì sao hàm cotang luôn luôn giảm (nghịch biến) mà không cần phải dùng đạo hàm phức tạp!"
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 5: TẬP XÁC ĐỊNH -->
+        <div class="slide">
+            <div class="slide-card">
+                <div class="slide-header">
+                    <div class="slide-subtitle">PHẦN 2 • ĐIỀU KIỆN TỒN TẠI HÀM SỐ</div>
+                    <h2 class="slide-title">2. Tập Xác Định: $\mathcal{D} = \mathbb{R} \setminus \{k\pi \mid k \in \mathbb{Z}\}$</h2>
+                </div>
+                <div class="grid-2">
+                    <div class="panel-box">
+                        <div class="math-danger-card">
+                            <strong>Điều kiện sống còn:</strong> Mẫu số $\sin x \neq 0 \iff x \neq k\pi \quad (k \in \mathbb{Z})$
+                        </div>
+                        <div class="math-highlight-card">
+                            $$\mathcal{D} = \mathbb{R} \setminus \{k\pi \mid k \in \mathbb{Z}\} = \mathbb{R} \setminus \{\dots, -\pi, 0, \pi, 2\pi, \dots\}$$
+                        </div>
+                        <ul class="feature-list">
+                            <li><strong>Vì sao $x = k\pi$ thì cotang biến mất? (Bí kíp ăn điểm miệng):</strong><br>
+                                Khi $x = 0$ hoặc $x = \pi$, điểm $M$ nằm bẹp dí trên trục hoành $Ox$. Tia $OM$ lúc này nằm ngang, tức là <strong>chạy song song tuyệt đối với trục cotang $y = 1$</strong>.
+                            </li>
+                            <li>Hai đường thẳng song song thì làm sao có thể cắt nhau? Không có giao điểm $H \implies$ không thể tính được $\cot x$!</li>
+                        </ul>
+                    </div>
+                    <div class="panel-box">
+                        <div class="student-trap-box" style="padding: 16px; border-radius: 12px; display: block;">
+                            <h4 style="color: #f43f5e; margin-bottom: 8px; font-size: 0.95rem;">⚠️ BẪY THI CỬ HAY GẶP: ĐỪNG ĐỂ LẪN VỚI HÀM TAN!</h4>
+                            <p style="font-size: 0.9rem; line-height: 1.6; color: #f8fafc;">
+                                • <strong>Hàm $y = \tan x$:</strong> Mẫu là Cos $\implies \cos x \neq 0 \implies x \neq \frac{\pi}{2} + k\pi$.<br>
+                                • <strong>Hàm $y = \cot x$:</strong> Mẫu là Sin $\implies \sin x \neq 0 \implies x \neq k\pi$.
+                            </p>
+                            <div style="margin-top: 10px; padding: 8px 12px; background: rgba(15,23,42,0.7); border-radius: 8px; font-size: 0.85rem; color: var(--accent);">
+                                💡 <strong>Mẹo của học sinh:</strong> Sin bằng 0 ở 2 đầu trục ngang ($0$ và $\pi$, tức chu kỳ $k\pi$). Nhìn thấy cotang là trừ bỏ ngay họ nghiệm $k\pi$!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="prompter-box">
+                    <span class="prompter-icon">🎙️</span>
+                    <div class="prompter-text">
+                        <strong>LỜI NÓI HỌC SINH (3:00 - 3:50):</strong> "Chỗ này đi thi thầy cô rất hay hỏi: 'Tại sao tại x = k.pi lại không có cotang?'. Tụi mình chỉ cần trả lời cực thông minh như sau: Vì khi đó tia OM nằm ngang song song với trục cotang. Như hai thanh ray xe lửa song song nhau thì không bao giờ cắt nhau để tạo ra giao điểm H được, nên cotang không tồn tại!"
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 6: BÀI TẬP TXĐ NÂNG CAO CÓ STEP-BY-STEP -->
+        <div class="slide">
+            <div class="slide-card">
+                <div class="slide-header">
+                    <div class="slide-subtitle">PHẦN 2 • RÈN LUYỆN KỸ NĂNG LÀM BÀI</div>
+                    <h2 class="slide-title">2. Thực Chiến Tìm TXĐ: 2 Bẫy Điển Hình Đề Thi Giữa Kỳ</h2>
+                </div>
+                <div class="grid-equal">
+                    <!-- Example 1 with interactive steps -->
+                    <div class="panel-box" style="background: rgba(15,23,42,0.7); padding: 18px; border-radius: 14px; border: 1px solid var(--border-card);">
+                        <h4 style="color: var(--accent); margin-bottom: 8px; font-size: 0.95rem;">VÍ DỤ 1 (Hàm hợp): $y = \cot\left(2x - \frac{\pi}{3}\right)$</h4>
+                        
+                        <div class="step-item active" onclick="toggleStep(this)">
+                            <div class="step-header">
+                                <span>Bước 1: Thiết lập điều kiện của ruột cot</span>
+                                <span style="font-size: 0.8rem; color: var(--primary);">▼</span>
+                            </div>
+                            <div class="step-body">
+                                Biểu thức bên trong cot phải khác $k\pi$:<br>
+                                $$\sin\left(2x - \frac{\pi}{3}\right) \neq 0 \iff 2x - \frac{\pi}{3} \neq k\pi \quad (k \in \mathbb{Z})$$
+                            </div>
+                        </div>
+
+                        <div class="step-item active" onclick="toggleStep(this)">
+                            <div class="step-header">
+                                <span>Bước 2: Rút gọn tìm $x$ (Cẩn thận chia 2)</span>
+                                <span style="font-size: 0.8rem; color: var(--primary);">▼</span>
+                            </div>
+                            <div class="step-body">
+                                Chuyển vế $-\frac{\pi}{3}$ sang thành $+\frac{\pi}{3}$ rồi chia cả hai vế cho $2$:<br>
+                                $$2x \neq \frac{\pi}{3} + k\pi \iff \mathbf{x \neq \frac{\pi}{6} + k\frac{\pi}{2}}$$
+                                <div style="color: var(--green); font-weight: bold; margin-top: 4px;">
+                                    $$\implies \mathcal{D} = \mathbb{R} \setminus \left\{\frac{\pi}{6} + k\frac{\pi}{2} \;\middle|\; k \in \mathbb{Z}\right\}$$
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Example 2 with trap explanation -->
+                    <div class="panel-box" style="background: rgba(15,23,42,0.7); padding: 18px; border-radius: 14px; border: 1px solid var(--border-card);">
+                        <h4 style="color: var(--secondary); margin-bottom: 8px; font-size: 0.95rem;">VÍ DỤ 2 (Bẫy gộp nghiệm): $y = \frac{\cot x}{\cos x - 1}$</h4>
+                        
+                        <div class="step-item active" onclick="toggleStep(this)">
+                            <div class="step-header">
+                                <span>Bước 1: Liệt kê đầy đủ 2 điều kiện mẫu</span>
+                                <span style="font-size: 0.8rem; color: var(--secondary);">▼</span>
+                            </div>
+                            <div class="step-body">
+                                Cả cotang và phân thức đều cần điều kiện:<br>
+                                $$\begin{cases} \text{cotang có nghĩa} \implies \sin x \neq 0 \iff x \neq k\pi \\ \text{mẫu số khác 0} \implies \cos x - 1 \neq 0 \iff \cos x \neq 1 \iff x \neq k2\pi \end{cases}$$
+                            </div>
+                        </div>
+
+                        <div class="step-item active" onclick="toggleStep(this)">
+                            <div class="step-header">
+                                <span>Bước 2: Tuyệt chiêu gộp nghiệm của học sinh</span>
+                                <span style="font-size: 0.8rem; color: var(--green);">▼</span>
+                            </div>
+                            <div class="step-body">
+                                Điểm biểu diễn của $k2\pi$ là điểm $(1, 0)$, hoàn toàn nằm bên trong tập $k\pi$ (gồm 2 điểm đối xứng qua gốc). Do đó tập $\{k2\pi\} \subset \{k\pi\}$.<br>
+                                <strong style="color: var(--green);">Kết luận chỉ cần: $x \neq k\pi$!</strong>
+                                <div style="color: var(--green); font-weight: bold; margin-top: 4px;">
+                                    $$\implies \mathcal{D} = \mathbb{R} \setminus \{k\pi \mid k \in \mathbb{Z}\}$$
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="prompter-box">
+                    <span class="prompter-icon">🎙️</span>
+                    <div class="prompter-text">
+                        <strong>LỜI NÓI HỌC SINH (3:50 - 4:40):</strong> "Ở ví dụ 1, lỗi sai ngớ ngẩn nhất mà tụi mình hay mắc phải là chia 2 cho pi/3 nhưng lại quên chia 2 cho chu kỳ k.pi! Nhớ là phải chia đều thành k.pi/2 nhé. Còn ở ví dụ 2 là bẫy gộp tập nghiệm: vì k2pi là con của kpi, nên chỉ cần loại trừ kpi là đã bao trọn cả bài toán rồi!"
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 7: TẬP GIÁ TRỊ -->
+        <div class="slide">
+            <div class="slide-card">
+                <div class="slide-header">
+                    <div class="slide-subtitle">PHẦN 3 • MIỀN GIÁ TRỊ RỘNG MỞ</div>
+                    <h2 class="slide-title">3. Tập Giá Trị: $\mathcal{T} = \mathbb{R}$ (Không Hề Bị Chặn!)</h2>
+                </div>
+                <div class="grid-2">
+                    <div class="panel-box">
+                        <div class="math-highlight-card" style="border-color: var(--accent); color: var(--accent);">
+                            $$\mathcal{T} = \mathbb{R} = (-\infty; +\infty)$$
+                        </div>
+                        <ul class="feature-list">
+                            <li><strong>Tự do bay nhảy:</strong> Trong khi $\sin x$ và $\cos x$ bị giam hãm ngặt nghèo trong chiếc lồng $[-1; 1]$, thì $\cot x$ có thể nhận bất kỳ giá trị nào từ $-\infty$ đến $+\infty$.</li>
+                            <li><strong>Hệ quả làm bài tập lượng giác:</strong> Phương trình lượng giác:
+                                $$\cot x = m$$
+                                <strong>LUÔN LUÔN CÓ NGHIỆM</strong> với mọi tham số thực $m$ (Dù $m = 1000$ hay $m = -1000000$ thì vẫn có nghiệm ngon lành!).
+                            </li>
+                            <li><strong>Không có GTLN và GTNN:</strong> Không bao giờ có giá trị lớn nhất hay nhỏ nhất trên tập xác định.</li>
+                        </ul>
+                    </div>
+                    <div class="panel-box" style="background: rgba(15,23,42,0.7); padding: 20px; border-radius: 14px; border: 1px solid var(--border-card);">
+                        <h4 style="color: var(--primary); margin-bottom: 8px;">QUY LUẬT LAO VỀ VÔ CỰC (XU HƯỚNG ĐỒ THỊ)</h4>
+                        <div style="font-family: var(--font-mono); font-size: 0.92rem; line-height: 1.8; color: #cbd5e1;">
+                            • Khi $x$ tiến sát về $0^+$: $\cot x$ phóng thẳng lên trời xanh $\mathbf{\to +\infty}$<br>
+                            • Khi $x$ tiến sát về $\pi^-$: $\cot x$ cắm thẳng xuống vực sâu $\mathbf{\to -\infty}$
+                        </div>
+                        <div class="student-tip-box" style="margin-top: 14px;">
+                            <span>🎯</span>
+                            <span><strong>Mẹo trắc nghiệm:</strong> Nếu đề bài hỏi <em>"Tìm GTLN của hàm số $y = \cot x$ trên $(0; \pi)$"</em> thì khoanh ngay đáp án: <strong>Không tồn tại!</strong></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="prompter-box">
+                    <span class="prompter-icon">🎙️</span>
+                    <div class="prompter-text">
+                        <strong>LỜI NÓI HỌC SINH (4:40 - 5:20):</strong> "Nhiều bạn quen thói quen làm bài với sin và cos nên thấy cot x = 5 lại tưởng vô nghiệm. Nhưng không phải đâu nhé! Tập giá trị của cotang là toàn bộ trục số thực R, nó vươn lên tới tận dương vô cùng và cắm sâu tới âm vô cùng. Nên cứ gặp cot x = m thì bất chấp m là bao nhiêu cũng luôn luôn có nghiệm!"
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 8: TÍNH CHẴN - LẺ -->
+        <div class="slide">
+            <div class="slide-card">
+                <div class="slide-header">
+                    <div class="slide-subtitle">PHẦN 4 • TÍNH ĐỐI XỨNG HỌC</div>
+                    <h2 class="slide-title">4. Tính Chẵn - Lẻ: $y = \cot x$ Là Một Hàm Số Lẻ</h2>
+                </div>
+                <div class="grid-2">
+                    <div class="panel-box">
+                        <div class="math-danger-card">
+                            $$\cot(-x) = -\cot x \quad (\forall x \in \mathcal{D})$$
+                        </div>
+                        <ul class="feature-list">
+                            <li><strong>Chứng minh 2 bước cực chuẩn để thầy cô cho 10 điểm:</strong>
+                                <ul style="margin: 6px 0 0 14px; font-size: 0.9rem; color: #cbd5e1;">
+                                    <li><strong>Bước 1 (Tập đối xứng):</strong> $\forall x \in \mathcal{D} \implies -x \in \mathcal{D}$ (Vì bỏ các điểm $k\pi$ thì bỏ cả âm lẫn dương đối xứng nhau qua số 0).</li>
+                                    <li><strong>Bước 2 (Đẩy dấu trừ ra ngoài):</strong>
+                                        $$\cot(-x) = \frac{\cos(-x)}{\sin(-x)} = \frac{\cos x}{-\sin x} = -\frac{\cos x}{\sin x} = -\cot x$$
+                                    </li>
+                                </ul>
+                            </li>
+                            <li><strong>Kết luận:</strong> $y = \cot x$ là <strong>hàm số lẻ</strong>.</li>
+                        </ul>
+                    </div>
+                    <div class="panel-box" style="background: rgba(15,23,42,0.7); padding: 22px; border-radius: 14px; border: 1px solid var(--border-card);">
+                        <h4 style="color: var(--green); margin-bottom: 10px; font-size: 1.05rem;">★ Ý NGHĨA HÌNH HỌC ĂN ĐIỂM TUYỆT ĐỐI</h4>
+                        <p style="font-size: 0.95rem; line-height: 1.6; color: #ffffff;">
+                            Đồ thị của mọi hàm số lẻ luôn nhận <strong>GỐC TỌA ĐỘ $O(0, 0)$ LÀM TÂM ĐỐI XỨNG</strong>.<br><br>
+                            Nếu trên đồ thị có một điểm uốn cong ở góc phần tư thứ nhất, thì chắc chắn sẽ có một điểm cong đối xứng ngược lại qua gốc $O$ ở góc phần tư thứ ba!
+                        </p>
+                    </div>
+                </div>
+                <div class="prompter-box">
+                    <span class="prompter-icon">🎙️</span>
+                    <div class="prompter-text">
+                        <strong>LỜI NÓI HỌC SINH (5:20 - 6:00):</strong> "Cách nhớ chẵn lẻ siêu dễ: Cos là hàm chẵn biết 'nuốt' dấu trừ, còn Sin là hàm lẻ đẩy dấu trừ ra trước. Thế nên khi lấy Cos chia Sin thì dấu trừ ở mẫu bị trồi lên đằng trước, thành -cot(x). Kết luận hàm cotang là hàm số lẻ và nhận gốc tọa độ O làm tâm đối xứng!"
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 9: CHU KỲ TUẦN HOÀN -->
+        <div class="slide">
+            <div class="slide-card">
+                <div class="slide-header">
+                    <div class="slide-subtitle">PHẦN 5 • TÍNH TUẦN HOÀN</div>
+                    <h2 class="slide-title">5. Chu Kỳ Tuần Hoàn: $T = \pi$ (Chỉ Cần Nửa Vòng Tròn)</h2>
+                </div>
+                <div class="grid-2">
+                    <div class="panel-box">
+                        <div class="math-highlight-card" style="border-color: var(--accent); color: var(--accent);">
+                            $$\cot(x + \pi) = \cot x \quad (\forall x \in \mathcal{D})$$
+                        </div>
+                        <ul class="feature-list">
+                            <li><strong>Chu kỳ cơ bản $T = \pi$ ($180^\circ$):</strong> Là khoảng cách ngắn nhất để hình dạng đồ thị lặp lại y hệt như cũ.</li>
+                            <li><strong>Giải thích hóm hỉnh: Vì sao Sin, Cos cần $2\pi$ mà Cot chỉ cần $\pi$?</strong><br>
+                                Khi đi nửa vòng tròn ($\pi$), cả Cos lẫn Sin đều bị đổi dấu âm. Lấy số âm chia cho số âm lại ra <strong>dấu dương ban đầu</strong>: $\frac{-\cos x}{-\sin x} = \cot x$. Hai dấu trừ tự triệt tiêu nhau, huề cả làng!
+                            </li>
+                            <li><strong>Mẹo khi vẽ đồ thị:</strong> Tụi mình chỉ cần vẽ thật đẹp 1 nhánh trong khoảng $(0; \pi)$, rồi cứ thế 'copy - paste' tịnh tiến sang trái, sang phải từng đoạn $\pi$ là xong!</li>
+                        </ul>
+                    </div>
+                    <div class="panel-box" style="background: rgba(15,23,42,0.7); padding: 18px; border-radius: 14px; border: 1px solid var(--border-card);">
+                        <h4 style="color: var(--primary); margin-bottom: 10px;">BẢNG SO SÁNH CHU KỲ 4 HÀM SỐ (ĐỀ THI HAY HỎI):</h4>
+                        <div style="display: flex; flex-direction: column; gap: 8px; font-family: var(--font-mono); font-size: 0.9rem;">
+                            <div style="display: flex; justify-content: space-between; padding: 8px 12px; background: rgba(56,189,248,0.08); border-radius: 8px;">
+                                <span>Hàm số $y = \sin x$</span><span style="color: var(--secondary); font-weight: bold;">$T = 2\pi$</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 8px 12px; background: rgba(56,189,248,0.08); border-radius: 8px;">
+                                <span>Hàm số $y = \cos x$</span><span style="color: var(--secondary); font-weight: bold;">$T = 2\pi$</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 8px 12px; background: rgba(250,204,21,0.18); border-radius: 8px; border: 1px solid var(--accent); font-weight: bold;">
+                                <span style="color: var(--accent);">Hàm số $y = \cot x$</span><span style="color: var(--accent);">$T = \pi$</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 8px 12px; background: rgba(56,189,248,0.08); border-radius: 8px;">
+                                <span>Hàm số $y = \tan x$</span><span style="color: var(--accent); font-weight: bold;">$T = \pi$</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="prompter-box">
+                    <span class="prompter-icon">🎙️</span>
+                    <div class="prompter-text">
+                        <strong>LỜI NÓI HỌC SINH (6:00 - 6:45):</strong> "Một câu hỏi trắc nghiệm cực kỳ phổ biến: chu kỳ của cotang là 2pi hay pi? Các bạn nhớ nhé: tan và cot chỉ cần nửa vòng tròn (pi) là đã lặp lại giá trị cũ rồi. Lý do là vì khi đi nửa vòng tròn, cả tử lẫn mẫu cùng bị âm, chia nhau lại thành dương ban đầu!"
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 10: TÍNH ĐƠN ĐIỆU (CHUẨN KNTT) -->
+        <div class="slide">
+            <div class="slide-card">
+                <div class="slide-header">
+                    <div class="slide-subtitle">PHẦN 6 • CHIỀU BIẾN THIÊN THEO SGK KẾT NỐI TRI THỨC</div>
+                    <h2 class="slide-title">6. Chiều Biến Thiên: Luôn Luôn Nghịch Biến Trên Từng Khoảng</h2>
+                </div>
+                <div class="grid-2">
+                    <div class="panel-box">
+                        <div class="math-highlight-card" style="border-color: var(--green); color: var(--green);">
+                            Hàm số $y = \cot x$ <strong>LUÔN NGHỊCH BIẾN</strong> trên mỗi khoảng $(k\pi; \pi + k\pi)$
+                        </div>
+                        <ul class="feature-list">
+                            <li><strong>Giải thích chuẩn mực SGK KNTT (Dành cho Lớp 11 chưa học đạo hàm):</strong><br>
+                                Khi góc $x$ tăng dần từ $0$ đến $\pi$, điểm $M$ chạy ngược chiều kim đồng hồ trên nửa trên đường tròn. Quan sát giao điểm $H(\cot x, 1)$ trên trục cotang, ta thấy <strong>$H$ chạy liên tục từ PHẢI sang TRÁI</strong>.
+                            </li>
+                            <li>Tọa độ từ phải sang trái nghĩa là giá trị hoành độ giảm liên tục từ $+\infty$ xuống $-\infty \implies$ Hàm số nghịch biến!</li>
+                            <li><strong>Cực trị:</strong> Hàm số $y = \cot x$ <strong>KHÔNG CÓ CỰC TRỊ</strong> (Không có đỉnh núi, không có đáy thung lũng).</li>
+                        </ul>
+                    </div>
+                    <div class="panel-box" style="background: rgba(15,23,42,0.7); padding: 20px; border-radius: 14px; border: 1px solid var(--border-card);">
+                        <h4 style="color: var(--accent); margin-bottom: 8px;">DÁNG ĐIỆU ĐỒ THỊ ĂN ĐIỂM: LUÔN LAO DỐC!</h4>
+                        <p style="font-size: 0.95rem; line-height: 1.6; color: #cbd5e1;">
+                            Đặc trưng của hàm nghịch biến là khi chúng ta nhìn từ trái sang phải, các nhánh đồ thị <strong>LUÔN ĐI DỐC XUỐNG CỰC MẠNH</strong> ($\searrow$).<br><br>
+                            Xuất phát từ đỉnh cao vời vợi $(+\infty)$, lao dốc cắt trục hoành tại tâm uốn $(\frac{\pi}{2}, 0)$, rồi tiếp tục cắm sâu xuống vực thẳm $(-\infty)$.
+                        </p>
+                    </div>
+                </div>
+                <div class="prompter-box">
+                    <span class="prompter-icon">🎙️</span>
+                    <div class="prompter-text">
+                        <strong>LỜI NÓI HỌC SINH (6:45 - 7:30):</strong> "Như hồi nãy tụi mình xem trên mô hình xoay góc: khi góc tăng lên thì điểm H chạy tuột từ phải sang trái. Điều này chứng minh 100% theo đúng SGK Toán 11 Kết Nối Tri Thức rằng hàm cotang luôn nghịch biến. Đồ thị cứ thế lao dốc từ trái sang phải, không hề có bất kỳ điểm cực đại hay cực tiểu nào!"
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 11: BẪY TRẮC NGHIỆM ĐƠN ĐIỆU CỰC HAY -->
+        <div class="slide">
+            <div class="slide-card">
+                <div class="slide-header">
+                    <div class="slide-subtitle">PHẦN 6 • PHẢN BIỆN ĐIỂM 10 CỦA HỌC SINH</div>
+                    <h2 class="slide-title">6. Vạch Trần Bẫy Kinh Điển: "Nghịch Biến Trên R" Là Sai Bét!</h2>
+                </div>
+                <div class="grid-center" style="max-width: 1020px; margin: 0 auto; width: 100%;">
+                    <div style="background: rgba(244,63,94,0.15); border: 2px solid var(--secondary); border-radius: 14px; padding: 18px 24px; width: 100%;">
+                        <h3 style="color: #f43f5e; margin-bottom: 8px; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+                            <span>🚨 CÂU LỪA ĐẢO QUỐC DÂN TRONG PHÒNG THI:</span>
+                        </h3>
+                        <p style="font-size: 1.05rem; line-height: 1.6; color: #ffffff;">
+                            ❌ <strong style="color: #fda4af;">ĐÁP ÁN BẪY:</strong> "Hàm số $y = \cot x$ nghịch biến trên $\mathbb{R}$" hoặc "nghịch biến trên $\mathcal{D}$".<br>
+                            ✔️ <strong style="color: var(--green);">ĐÁP ÁN CHÍNH XÁC:</strong> "Hàm số $y = \cot x$ nghịch biến trên <em>TỪNG KHOẢNG XÁC ĐỊNH</em> $(k\pi; \pi + k\pi)$".
+                        </p>
+                    </div>
+                    <div style="background: rgba(15,23,42,0.85); border: 1px solid var(--border-card); border-radius: 14px; padding: 18px 24px; width: 100%;">
+                        <h4 style="color: var(--accent); margin-bottom: 8px; font-size: 1.02rem;">TỤI MÌNH PHẢN CHỨNG BẰNG MỘT VÍ DỤ CỰC KỲ DỄ HIỂU:</h4>
+                        <div style="font-family: var(--font-mono); font-size: 0.95rem; line-height: 1.8; color: #cbd5e1;">
+                            • Lấy $x_1 = \frac{3\pi}{4} \in (0; \pi) \implies \cot(x_1) = \mathbf{-1}$<br>
+                            • Lấy $x_2 = \frac{5\pi}{4} \in (\pi; 2\pi) \implies \cot(x_2) = \mathbf{+1}$<br>
+                            • So sánh: Rõ ràng $x_1 < x_2$ nhưng giá trị lại là: $\cot(x_1) = -1 < \cot(x_2) = 1$ $\implies$ <strong>Giá trị lại TĂNG LÊN!</strong>
+                        </div>
+                        <div style="margin-top: 10px; padding: 8px 12px; background: rgba(56,189,248,0.1); border-radius: 8px; color: var(--primary); font-size: 0.9rem;">
+                            👉 <strong>Bản chất:</strong> Vì đồ thị bị đứt gãy tại bức tường tiệm cận $x = \pi$. Điểm nhảy vọt từ đáy vực $-\infty$ lên lại đỉnh cao $+\infty$, nên cấm kỵ so sánh gộp hai giá trị ở hai khoảng khác nhau!
+                        </div>
+                    </div>
+                </div>
+                <div class="prompter-box">
+                    <span class="prompter-icon">🎙️</span>
+                    <div class="prompter-text">
+                        <strong>LỜI NÓI HỌC SINH (7:30 - 8:15):</strong> "Các bạn ơi, chú ý slide này nhé, đây chính là cái bẫy đề thi hay lừa cả lớp mình nhất nè! Nếu đề bài ghi 'nghịch biến trên R' hay 'nghịch biến trên D' là gạch ngay lập tức! Vì qua bức tường tiệm cận pi, đồ thị nó đứt quãng rồi nhảy vọt từ âm 1 lên dương 1. Nhóm mình chỉ được chọn câu có chữ 'nghịch biến trên TỪNG KHOẢNG' thôi nhé!"
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 12: BẢNG BIẾN THIÊN CHUẨN KNTT -->
+        <div class="slide">
+            <div class="slide-card">
+                <div class="slide-header">
+                    <div class="slide-subtitle">PHẦN 7 • TỔNG HỢP BIẾN THIÊN</div>
+                    <h2 class="slide-title">Bảng Biến Thiên Hàm Số $y = \cot x$ Trên Chu Kỳ $(0; \pi)$</h2>
+                </div>
+                <div class="grid-center">
+                    <div class="media-frame" style="max-height: 380px; width: 100%;" onclick="openLightbox('bbt_cotx_hd.png', 'Bảng Biến Thiên Hàm Số y = cot x Chuẩn SGK KNTT')">
+                        <img src="bbt_cotx_hd.png" alt="Bảng biến thiên y = cot x">
+                        <span class="zoom-hint">🔍 Nhấp để phóng to</span>
+                    </div>
+                    <div style="display: flex; gap: 20px; font-size: 0.92rem; color: #cbd5e1; background: rgba(15,23,42,0.65); padding: 10px 20px; border-radius: 10px; border: 1px solid var(--border-card);">
+                        <span>• <strong style="color: var(--secondary);">Hai vạch đỏ tử thần:</strong> Không xác định tại mốc $x = 0$ và $x = \pi$</span>
+                        <span>• <strong style="color: var(--accent);">Mũi tên vàng trượt dốc:</strong> Đi thẳng từ $+\infty \to 0 \to -\infty$</span>
+                        <span>• <strong style="color: var(--primary);">Điểm thăng bằng:</strong> Cắt trục hoành tại $x = \frac{\pi}{2}$ thì $y = 0$</span>
+                    </div>
+                </div>
+                <div class="prompter-box">
+                    <span class="prompter-icon">🎙️</span>
+                    <div class="prompter-text">
+                        <strong>LỜI NÓI HỌC SINH (8:15 - 8:50):</strong> "Trên màn hình là bảng biến thiên mẫu chuẩn đét theo SGK Kết Nối Tri Thức: hai vạch đỏ thể hiện hàm số không xác định tại 0 và pi. Mũi tên vàng lao dốc không phanh từ dương vô cực, ghé qua số 0 ở điểm giữa pi/2, rồi lao thẳng xuống âm vô cực."
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 13: ĐỒ THỊ GIẢI TÍCH HOÀN CHỈNH -->
+        <div class="slide">
+            <div class="slide-card">
+                <div class="slide-header">
+                    <div class="slide-subtitle">PHẦN 7 • ĐỒ THỊ GIẢI TÍCH</div>
+                    <h2 class="slide-title">7. Đồ Thị $y = \cot x$: Nhánh Cong Lao Dốc Qua Tâm Đối Xứng</h2>
+                </div>
+                <div class="grid-2">
+                    <div class="panel-box">
+                        <ul class="feature-list">
+                            <li><strong>Hình dạng đồ thị:</strong> Gồm vô số nhánh lặp lại tuần hoàn chu kỳ $\pi$. Mỗi nhánh đều có hình dáng cong mượt mà đổ dốc từ trái qua phải.</li>
+                            <li><strong>Bức tường tiệm cận đứng:</strong> Các đường nét đứt màu đỏ $x = k\pi$ ($x = 0, \pm\pi, \pm2\pi\dots$). Đồ thị vuốt sát vào nhưng không bao giờ được phép chạm tới!</li>
+                            <li><strong>Các điểm mốc tụi mình cần chấm chính xác khi vẽ:</strong>
+                                <ul style="margin: 4px 0 0 14px; font-size: 0.9rem; color: #cbd5e1;">
+                                    <li>Cắt trục hoành tại tâm uốn: $(\frac{\pi}{2} + k\pi, 0)$</li>
+                                    <li>Điểm trợ thủ góc $45^\circ$: $(\frac{\pi}{4}, 1)$ và $(\frac{3\pi}{4}, -1)$</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="media-frame" onclick="openLightbox('graph_cotx_hd.png', 'Đồ Thị Hàm Số y = cot x Ultra HD')">
+                        <img src="graph_cotx_hd.png" alt="Đồ thị hàm số y = cot x">
+                        <span class="zoom-hint">🔍 Nhấp để phóng to</span>
+                    </div>
+                </div>
+                <div class="prompter-box">
+                    <span class="prompter-icon">🎙️</span>
+                    <div class="prompter-text">
+                        <strong>LỜI NÓI HỌC SINH (8:50 - 9:40):</strong> "Khi vẽ đồ thị hàm cotang vào bài thi, bí quyết của nhóm mình là: Vẽ trước các đường tiệm cận đứng đứt nét x = k.pi, sau đó chấm 3 điểm mốc quan trọng nhất: pi/4 bằng 1, pi/2 bằng 0, và 3pi/4 bằng -1. Rồi uốn một đường cong dốc xuống thật mềm mại là đảm bảo thầy cô chấm điểm tuyệt đối!"
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 14: SO SÁNH TAN VÀ COT -->
+        <div class="slide">
+            <div class="slide-card">
+                <div class="slide-header">
+                    <div class="slide-subtitle">MỞ RỘNG ĐỐI CHIẾU • KHÔNG BAO GIỜ BỊ NHẦM LẪN</div>
+                    <h2 class="slide-title">So Sánh Trực Quan: $y = \tan x$ (Lên Đỉnh) vs $y = \cot x$ (Xuống Dốc)</h2>
+                </div>
+                <div class="grid-center">
+                    <div class="media-frame" style="max-height: 380px; width: 100%;" onclick="openLightbox('so_sanh_hd.png', 'So Sánh Trực Quan y = tan x và y = cot x')">
+                        <img src="so_sanh_hd.png" alt="So sánh tan x và cot x">
+                        <span class="zoom-hint">🔍 Nhấp để phóng to</span>
+                    </div>
+                    <div style="display: flex; gap: 30px; font-size: 0.92rem; color: #cbd5e1; background: rgba(15,23,42,0.65); padding: 10px 24px; border-radius: 10px; border: 1px solid var(--border-card);">
+                        <span>• <strong style="color: var(--secondary);">Hàm $y = \tan x$:</strong> Luôn ĐỒNG BIẾN đi lên ($\nearrow$), tiệm cận đứng $x = \frac{\pi}{2} + k\pi$</span>
+                        <span>• <strong style="color: var(--primary);">Hàm $y = \cot x$:</strong> Luôn NGHỊCH BIẾN đi xuống ($\searrow$), tiệm cận đứng $x = k\pi$</span>
+                    </div>
+                </div>
+                <div class="prompter-box">
+                    <span class="prompter-icon">🎙️</span>
+                    <div class="prompter-text">
+                        <strong>LỜI NÓI HỌC SINH (9:40 - 10:20):</strong> "Hình so sánh này là bảo bối của lớp mình nè: Nhánh màu đỏ là tan x, luôn leo dốc đi lên (đồng biến). Còn nhánh màu xanh là cot x, luôn trượt dốc đi xuống (nghịch biến). Tiệm cận của tan là pi/2 + k.pi, còn tiệm cận của cot là k.pi. Cứ nhớ hình ảnh này là không bao giờ nhầm được!"
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 15: TRẮC NGHIỆM ĐỐ LỚP CÓ PHÁO HOA & TỔNG KẾT BÀI -->
+        <div class="slide">
+            <div class="slide-card">
+                <div class="slide-header">
+                    <div class="slide-subtitle">VỀ ĐÍCH THÀNH CÔNG • TRẮC NGHIỆM TƯƠNG TÁC RINH ĐIỂM</div>
+                    <h2 class="slide-title">Đố Vui Cả Lớp 2 Câu Trắc Nghiệm & 7 Bí Kíp Bỏ Túi</h2>
+                </div>
+                <div class="grid-equal">
+                    <div class="panel-box">
+                        <h4 style="color: var(--accent); margin-bottom: 6px; font-size: 0.95rem;">❓ BẤM ĐÁP ÁN ĐỂ BẮN PHÁO HOA ĂN MỪNG:</h4>
+                        
+                        <div class="quiz-card">
+                            <p style="font-size: 0.88rem; font-weight: bold; color: #f8fafc;">Câu 1: Chu kỳ tuần hoàn cơ bản của hàm số $y = \cot x$ là?</p>
+                            <div class="quiz-option" onclick="checkQuizWithConfetti(this, false)">A. $T = 2\pi$ <span></span></div>
+                            <div class="quiz-option" onclick="checkQuizWithConfetti(this, true)">B. $T = \pi$ <span></span></div>
+                        </div>
+
+                        <div class="quiz-card">
+                            <p style="font-size: 0.88rem; font-weight: bold; color: #f8fafc;">Câu 2: Phát biểu nào sau đây là CHÍNH XÁC NHẤT?</p>
+                            <div class="quiz-option" onclick="checkQuizWithConfetti(this, false)">A. Hàm số nghịch biến trên $\mathbb{R}$ <span></span></div>
+                            <div class="quiz-option" onclick="checkQuizWithConfetti(this, true)">B. Hàm số nghịch biến trên mỗi khoảng $(k\pi; \pi + k\pi)$ <span></span></div>
+                        </div>
+                    </div>
+
+                    <div class="panel-box" style="background: rgba(15,23,42,0.7); padding: 18px; border-radius: 14px; border: 1px solid var(--border-card);">
+                        <h4 style="color: var(--primary); margin-bottom: 8px; font-size: 0.95rem;">📋 7 THÔNG SỐ VÀNG CẢ LỚP CẦN NẰM LÒNG:</h4>
+                        <ul style="list-style: none; font-size: 0.88rem; line-height: 1.7; color: #ffffff;">
+                            <li>• <strong>1. Đại số:</strong> $y = \cot x = \frac{\cos x}{\sin x}$</li>
+                            <li>• <strong>2. Tập xác định:</strong> $\mathcal{D} = \mathbb{R} \setminus \{k\pi \mid k \in \mathbb{Z}\}$</li>
+                            <li>• <strong>3. Tập giá trị:</strong> $\mathcal{T} = \mathbb{R} = (-\infty; +\infty)$</li>
+                            <li>• <strong>4. Tính chẵn - lẻ:</strong> Hàm số lẻ (đối xứng qua gốc $O$)</li>
+                            <li>• <strong>5. Chu kỳ cơ bản:</strong> $T = \pi$ ($180^\circ$)</li>
+                            <li>• <strong>6. Chiều biến thiên:</strong> LUÔN NGHỊCH BIẾN trên từng $(k\pi; \pi + k\pi)$</li>
+                            <li>• <strong>7. Tiệm cận đứng:</strong> Các đường thẳng $x = k\pi$</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="prompter-box">
+                    <span class="prompter-icon">🎙️</span>
+                    <div class="prompter-text">
+                        <strong>LỜI NÓI HỌC SINH KẾT BÀI (10:20 - 11:00):</strong> "Và đó là toàn bộ 7 thông số cốt lõi để phá đảo hàm số y = cot x! Bài thuyết trình của nhóm mình đến đây là kết thúc. Rất cảm ơn thầy cô và tất cả các bạn đã cùng nhóm mình giải mã bài học hôm nay. Nhóm mình rất sẵn sàng nhận những câu hỏi thú vị hoặc những góp ý từ thầy cô và cả lớp ạ!"
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bottom Controls & Navigation -->
+    <footer>
+        <div class="progress-track" id="dots-container"></div>
+        <div class="btn-group">
+            <button class="btn-ui" id="prev-btn">◀ Trang trước (Left)</button>
+            <button class="btn-ui" id="next-btn">Trang sau (Right) ▶</button>
+            <button class="btn-ui" id="toggle-notes-btn">🎙️ Lời thoại học sinh (N)</button>
+            <button class="btn-ui btn-primary-glow" id="fullscreen-btn">⛶ Toàn màn hình (F)</button>
+        </div>
+    </footer>
+
+    <!-- Fullscreen Lightbox Modal -->
+    <div id="lightbox-modal" onclick="closeLightbox(event)">
+        <button class="lightbox-close-btn" onclick="closeLightboxDirect()">✕ Đóng (ESC)</button>
+        <img id="lightbox-img" src="" alt="Zoomed Diagram">
+        <div id="lightbox-caption" style="color: var(--primary); margin-top: 14px; font-weight: 700; font-size: 1.1rem;"></div>
+    </div>
+
+    <!-- JavaScript Navigation, Interactive Canvas, KaTeX & Confetti -->
+    <script>
+        // 1. Mathematical Coordinate Canvas Animation
+        const bgCanvas = document.getElementById('bg-canvas');
+        const bgCtx = bgCanvas.getContext('2d');
+        let width = bgCanvas.width = window.innerWidth;
+        let height = bgCanvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = bgCanvas.width = window.innerWidth;
+            height = bgCanvas.height = window.innerHeight;
+            resizeConfetti();
+        });
+
+        let offset = 0;
+        function drawBackgroundGrid() {
+            bgCtx.clearRect(0, 0, width, height);
+            bgCtx.strokeStyle = 'rgba(56, 189, 248, 0.04)';
+            bgCtx.lineWidth = 1;
+
+            const gridSize = 45;
+            for (let x = 0; x < width; x += gridSize) {
+                bgCtx.beginPath();
+                bgCtx.moveTo(x, 0);
+                bgCtx.lineTo(x, height);
+                bgCtx.stroke();
+            }
+            for (let y = 0; y < height; y += gridSize) {
+                bgCtx.beginPath();
+                bgCtx.moveTo(0, y);
+                bgCtx.lineTo(width, y);
+                bgCtx.stroke();
+            }
+
+            // Subtle moving cotangent wave ripple
+            bgCtx.strokeStyle = 'rgba(56, 189, 248, 0.12)';
+            bgCtx.lineWidth = 1.5;
+            bgCtx.beginPath();
+            for (let x = 0; x < width; x += 6) {
+                const y = height / 2 + Math.sin((x + offset) * 0.005) * 70;
+                if (x === 0) bgCtx.moveTo(x, y);
+                else bgCtx.lineTo(x, y);
+            }
+            bgCtx.stroke();
+
+            offset += 0.8;
+            requestAnimationFrame(drawBackgroundGrid);
+        }
+        drawBackgroundGrid();
+
+        // 2. Interactive Unit Circle Simulation (Slide 4)
+        const unitCanvas = document.getElementById('unit-circle-canvas');
+        const unitCtx = unitCanvas.getContext('2d');
+        const angleSlider = document.getElementById('angle-slider');
+        const angleDisplay = document.getElementById('angle-display');
+        const valCos = document.getElementById('val-cos');
+        const valSin = document.getElementById('val-sin');
+        const valCot = document.getElementById('val-cot');
+        const valPt = document.getElementById('val-pt');
+
+        let currentAngleDeg = 45;
+
+        function drawInteractiveUnitCircle(deg) {
+            const w = unitCanvas.width;
+            const h = unitCanvas.height;
+            unitCtx.clearRect(0, 0, w, h);
+
+            const cx = w / 2;
+            const cy = h / 2 + 30; // slightly lower to show tangent line on top
+            const R = 75; // radius in px
+
+            // Axes
+            unitCtx.strokeStyle = 'rgba(148, 163, 184, 0.35)';
+            unitCtx.lineWidth = 1;
+            // X axis
+            unitCtx.beginPath();
+            unitCtx.moveTo(20, cy);
+            unitCtx.lineTo(w - 20, cy);
+            unitCtx.stroke();
+            // Y axis
+            unitCtx.beginPath();
+            unitCtx.moveTo(cx, 15);
+            unitCtx.lineTo(cx, h - 15);
+            unitCtx.stroke();
+
+            // Circle
+            unitCtx.strokeStyle = 'rgba(56, 189, 248, 0.5)';
+            unitCtx.lineWidth = 2;
+            unitCtx.beginPath();
+            unitCtx.arc(cx, cy, R, 0, Math.PI * 2);
+            unitCtx.stroke();
+
+            // Tangent Line at J(0, 1) -> y = cy - R
+            const tangentY = cy - R;
+            unitCtx.strokeStyle = '#facc15';
+            unitCtx.lineWidth = 2.5;
+            unitCtx.setLineDash([5, 4]);
+            unitCtx.beginPath();
+            unitCtx.moveTo(15, tangentY);
+            unitCtx.lineTo(w - 15, tangentY);
+            unitCtx.stroke();
+            unitCtx.setLineDash([]);
+
+            // Label J(0, 1)
+            unitCtx.fillStyle = '#facc15';
+            unitCtx.font = 'bold 11px JetBrains Mono';
+            unitCtx.fillText("J(0,1) Trục cotang y=1", cx + 8, tangentY - 7);
+            unitCtx.beginPath();
+            unitCtx.arc(cx, tangentY, 3.5, 0, Math.PI * 2);
+            unitCtx.fill();
+
+            // Angle math
+            const rad = (deg * Math.PI) / 180;
+            const cosVal = Math.cos(rad);
+            const sinVal = Math.sin(rad);
+            const cotVal = 1 / Math.tan(rad);
+
+            // Point M on circle
+            const mx = cx + R * cosVal;
+            const my = cy - R * sinVal;
+
+            // Point H on tangent line y = tangentY
+            // cotVal = cos / sin -> Hx = cx + R * cotVal
+            const hx = cx + R * cotVal;
+            const hy = tangentY;
+
+            // Extended Ray from O through M to H
+            unitCtx.strokeStyle = '#38bdf8';
+            unitCtx.lineWidth = 2;
+            unitCtx.beginPath();
+            unitCtx.moveTo(cx, cy);
+            unitCtx.lineTo(hx, hy);
+            unitCtx.stroke();
+
+            // Cotang segment on tangent line from J(cx, tangentY) to H(hx, tangentY)
+            unitCtx.strokeStyle = '#f43f5e';
+            unitCtx.lineWidth = 4;
+            unitCtx.beginPath();
+            unitCtx.moveTo(cx, tangentY);
+            unitCtx.lineTo(hx, tangentY);
+            unitCtx.stroke();
+
+            // Draw Point M
+            unitCtx.fillStyle = '#34d399';
+            unitCtx.beginPath();
+            unitCtx.arc(mx, my, 5, 0, Math.PI * 2);
+            unitCtx.fill();
+            unitCtx.fillText("M", mx + 6, my - 6);
+
+            // Draw Point H
+            unitCtx.fillStyle = '#c084fc';
+            unitCtx.beginPath();
+            unitCtx.arc(hx, hy, 6, 0, Math.PI * 2);
+            unitCtx.fill();
+            unitCtx.fillText(`H(${cotVal.toFixed(2)})`, hx - 18, hy - 10);
+
+            // Draw Angle Arc
+            unitCtx.strokeStyle = 'rgba(250, 204, 21, 0.7)';
+            unitCtx.lineWidth = 1.5;
+            unitCtx.beginPath();
+            unitCtx.arc(cx, cy, 22, 0, -rad, true);
+            unitCtx.stroke();
+
+            // Update stats
+            angleDisplay.textContent = `${deg}°`;
+            valCos.textContent = cosVal.toFixed(2);
+            valSin.textContent = sinVal.toFixed(2);
+            valCot.textContent = cotVal.toFixed(2);
+            valPt.textContent = `(${cotVal.toFixed(1)}, 1)`;
+        }
+
+        if (angleSlider) {
+            angleSlider.addEventListener('input', (e) => {
+                currentAngleDeg = parseInt(e.target.value);
+                drawInteractiveUnitCircle(currentAngleDeg);
+                updateActivePresetBtn(currentAngleDeg);
+            });
+            drawInteractiveUnitCircle(currentAngleDeg);
+        }
+
+        function setAngle(deg) {
+            currentAngleDeg = deg;
+            if (angleSlider) angleSlider.value = deg;
+            drawInteractiveUnitCircle(deg);
+            updateActivePresetBtn(deg);
+        }
+
+        function updateActivePresetBtn(deg) {
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                const text = btn.textContent;
+                btn.classList.toggle('active', text.startsWith(`${deg}°`));
+            });
+        }
+
+        // 3. Step-by-Step Accordion Logic (Slide 6)
+        function toggleStep(element) {
+            element.classList.toggle('active');
+        }
+
+        // 4. Slide State Management
+        const slides = document.querySelectorAll('.slide');
+        const dotsContainer = document.getElementById('dots-container');
+        const slideIndexLabel = document.getElementById('slide-index-label');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const toggleNotesBtn = document.getElementById('toggle-notes-btn');
+        let currentSlide = 0;
+
+        slides.forEach((_, idx) => {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            if (idx === 0) dot.classList.add('active');
+            dot.title = `Chuyển tới Slide ${idx + 1}`;
+            dot.addEventListener('click', () => goToSlide(idx));
+            dotsContainer.appendChild(dot);
+        });
+
+        const dots = document.querySelectorAll('.dot');
+
+        function updateSlide() {
+            slides.forEach((s, idx) => {
+                s.classList.toggle('active', idx === currentSlide);
+            });
+            dots.forEach((d, idx) => {
+                d.classList.toggle('active', idx === currentSlide);
+            });
+            slideIndexLabel.textContent = `SLIDE ${currentSlide + 1} / ${slides.length}`;
+            if (currentSlide === 3) {
+                // Redraw slide 4 canvas
+                setTimeout(() => drawInteractiveUnitCircle(currentAngleDeg), 50);
+            }
+        }
+
+        function goToSlide(idx) {
+            currentSlide = idx;
+            updateSlide();
+        }
+
+        prevBtn.addEventListener('click', () => {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        });
+
+        // Toggle Speaker Notes
+        let notesVisible = true;
+        toggleNotesBtn.addEventListener('click', () => {
+            notesVisible = !notesVisible;
+            document.querySelectorAll('.prompter-box').forEach(box => {
+                box.classList.toggle('collapsed', !notesVisible);
+            });
+            toggleNotesBtn.textContent = notesVisible ? '🎙️ Lời thoại học sinh (N)' : '🎙️ Hiện Lời thoại (N)';
+        });
+
+        // Keyboard Controls
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'Space') {
+                if (currentSlide < slides.length - 1) {
+                    currentSlide++;
+                    updateSlide();
+                }
+            } else if (e.key === 'ArrowLeft') {
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    updateSlide();
+                }
+            } else if (e.key.toLowerCase() === 'f') {
+                toggleFullscreen();
+            } else if (e.key.toLowerCase() === 'n') {
+                toggleNotesBtn.click();
+            } else if (e.key === 'Escape') {
+                closeLightboxDirect();
+            }
+        });
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+        fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+        // Timer
+        let seconds = 0;
+        setInterval(() => {
+            seconds++;
+            const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+            const s = String(seconds % 60).padStart(2, '0');
+            document.getElementById('elapsed-time').textContent = `${m}:${s}`;
+        }, 1000);
+
+        // Lightbox Functions
+        const lightbox = document.getElementById('lightbox-modal');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const lightboxCaption = document.getElementById('lightbox-caption');
+
+        function openLightbox(src, caption) {
+            lightboxImg.src = src;
+            lightboxCaption.textContent = caption;
+            lightbox.classList.add('active');
+        }
+
+        function closeLightbox(e) {
+            if (e.target === lightbox) {
+                lightbox.classList.remove('active');
+            }
+        }
+
+        function closeLightboxDirect() {
+            lightbox.classList.remove('active');
+        }
+
+        // 5. Quiz Logic with Pure JS Confetti Cannon
+        const confettiCanvas = document.getElementById('confetti-canvas');
+        const confettiCtx = confettiCanvas.getContext('2d');
+        let confettiParticles = [];
+
+        function resizeConfetti() {
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+        }
+        resizeConfetti();
+
+        function fireConfetti() {
+            const colors = ['#38bdf8', '#facc15', '#f43f5e', '#34d399', '#c084fc', '#ffffff'];
+            for (let i = 0; i < 90; i++) {
+                confettiParticles.push({
+                    x: confettiCanvas.width / 2 + (Math.random() - 0.5) * 200,
+                    y: confettiCanvas.height / 2,
+                    vx: (Math.random() - 0.5) * 16,
+                    vy: (Math.random() - 1.2) * 14,
+                    size: Math.random() * 8 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    rotation: Math.random() * 360,
+                    rotationSpeed: (Math.random() - 0.5) * 10,
+                    alpha: 1
+                });
+            }
+        }
+
+        function updateConfetti() {
+            confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            for (let i = confettiParticles.length - 1; i >= 0; i--) {
+                const p = confettiParticles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.35; // gravity
+                p.rotation += p.rotationSpeed;
+                p.alpha -= 0.012;
+
+                if (p.alpha <= 0) {
+                    confettiParticles.splice(i, 1);
+                    continue;
+                }
+
+                confettiCtx.save();
+                confettiCtx.globalAlpha = p.alpha;
+                confettiCtx.translate(p.x, p.y);
+                confettiCtx.rotate((p.rotation * Math.PI) / 180);
+                confettiCtx.fillStyle = p.color;
+                confettiCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                confettiCtx.restore();
+            }
+            requestAnimationFrame(updateConfetti);
+        }
+        updateConfetti();
+
+        function checkQuizWithConfetti(element, isCorrect) {
+            const parent = element.parentElement;
+            parent.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.classList.remove('correct', 'wrong');
+            });
+            if (isCorrect) {
+                element.classList.add('correct');
+                element.querySelector('span').textContent = ' 🎉 CHUẨN XÁC!';
+                fireConfetti();
+            } else {
+                element.classList.add('wrong');
+                element.querySelector('span').textContent = ' ✖ CHƯA ĐÚNG';
+            }
+        }
+
+        // Initialize KaTeX Auto-Render
+        document.addEventListener("DOMContentLoaded", function() {
+            if (window.renderMathInElement) {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError: false
+                });
+            }
+        });
+    </script>
+</body>
+</html>
